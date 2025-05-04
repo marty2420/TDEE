@@ -77,7 +77,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         </div>
         <div className="border border-gray-200 p-4 rounded-lg">
           <div className="flex items-center mb-2">
-            <div size={20} className="text-amber-600 mr-2" />
+            <FlameIcon size={20} className="text-amber-600 mr-2" />
             <h4 className="font-medium">Carbohydrates</h4>
           </div>
           <p className="text-2xl font-bold">
@@ -94,7 +94,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         </div>
         <div className="border border-gray-200 p-4 rounded-lg">
           <div className="flex items-center mb-2">
-            <div size={20} className="text-blue-600 mr-2" />
+            <FlameIcon size={20} className="text-blue-600 mr-2" />
             <h4 className="font-medium">Fat</h4>
           </div>
           <p className="text-2xl font-bold">

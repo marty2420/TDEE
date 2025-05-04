@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserIcon, SettingsIcon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -56,6 +55,7 @@ const Dashboard: React.FC = () => {
               </p>
             </div>
           </div>
+          
         </div>
         <div className="w-full md:w-2/3">
           <h1 className="text-2xl font-bold mb-6">Your TDEE Calculator</h1>

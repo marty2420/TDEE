@@ -1,6 +1,6 @@
-import React from 'react';
+import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { ActivityIcon, CalculatorIcon, SaveIcon, UserIcon } from 'lucide-react';
+import { ActivityIcon, CalculatorIcon, SaveIcon } from 'lucide-react';
 const Home: React.FC = () => {
   return <div className="max-w-6xl mx-auto">
       <section className="py-12 md:py-20">

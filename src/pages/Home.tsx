@@ -13,9 +13,13 @@ const Home: React.FC = () => {
             Expenditure and provides personalized nutrition recommendations
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <Link to="/signup" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-medium text-lg">
-              Get Started
-            </Link>
+          <Link
+  to="/signup"
+  className="bg-[#3C5C54] hover:bg-[#4D6C5B] text-white px-6 py-3 rounded-md font-medium text-lg transition-colors duration-300"
+>
+  Get Started
+</Link>
+
             <Link to="/login" className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-800 px-6 py-3 rounded-md font-medium text-lg">
               Sign In
             </Link>

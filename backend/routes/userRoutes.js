@@ -37,7 +37,7 @@ router.post('/login', async (req, res) => {
 
     res.status(200).json({ message: 'Login successful', user: userResponse });
   } catch (err) {
-    console.error('❌ Error during login:', err);
+    console.error('Error during login:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -78,7 +78,7 @@ router.post('/signup', async (req, res) => {
 
 
     await newUser.save().catch(err => {
-        console.error('❌ Mongoose validation error:', err);
+        console.error('Mongoose validation error:', err);
         return res.status(400).json({ error: 'Validation failed', details: err.message });
       });
       
@@ -98,9 +98,42 @@ router.post('/signup', async (req, res) => {
     res.status(201).json({ message: 'Account created successfully', user: userResponse });
 
   } catch (err) {
-    console.error("❌ Error during signup:", err);
+    console.error("Error during signup:", err);
     res.status(500).json({ error: 'Server error' });
   }
 });
+// Update TDEE input + results
+router.put('/tdee', async (req, res) => {
+  console.log('🔥 /tdee route hit');
+  const { userId, input, tdeeResults } = req.body;
+
+  if (!userId || !input || !tdeeResults) {
+    return res.status(400).json({ error: 'User ID, input, and TDEE results are required' });
+  }
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        input,        // saves age, gender, weight, etc.
+        tdeeResults   // saves BMR, TDEE, etc.
+      },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.status(200).json({
+      message: 'TDEE data saved successfully',
+      user: updatedUser
+    });
+  } catch (err) {
+    console.error('❌ Error updating TDEE:', err);
+    res.status(500).json({ error: 'Server error while saving TDEE data' });
+  }
+});
+
 
 module.exports = router;

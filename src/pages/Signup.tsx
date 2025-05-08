@@ -13,12 +13,12 @@ const Signup: React.FC = () => {
           <SignupForm />
           <p className="text-center mt-6">
             Already have an account?{' '}
-            <Link to="/login" className="text-blue-600 hover:underline">
+            <Link to="/login" className="text-blue-600 hover:text-[#7aa59b] hover:underline transition-colors duration-200">
               Log in
             </Link>
           </p>
         </div>
-        <div className="hidden md:block flex-1 bg-green-600 rounded-lg overflow-hidden">
+        <div className="hidden md:block flex-1 bg-[#3C5C54] rounded-lg overflow-hidden">
           <div className="h-full flex items-center justify-center p-8">
             <div className="text-white">
               <h2 className="text-2xl font-bold mb-4">

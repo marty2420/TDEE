@@ -38,26 +38,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
+    setIsLoading(true); // Start loading
     try {
       interface LoginResponse {
         user: User;
       }
+  
+      // Simulated delay para sa loading state (e.g. 2 seconds)
+      await new Promise(resolve => setTimeout(resolve, 2000));
+  
       const response = await axios.post<LoginResponse>('/api/users/login', { email, password });
-      const loggedInUser = response.data.user; // assuming backend returns user data
+      const loggedInUser = response.data.user;
       setUser(loggedInUser);
       localStorage.setItem('tdeeUser', JSON.stringify(loggedInUser));
       return true;
     } catch (err) {
       console.error('Login failed:', email, password, err);
       return false;
+    } finally {
+      setIsLoading(false); // Stop loading
     }
   };
-
+  
   const signup = async (name: string, email: string, password: string): Promise<boolean | string> => {
+    setIsLoading(true); // Start loading
     try {
       interface SignupResponse {
         user: User;
       }
+  
+      // Simulated delay (2 seconds)
+      await new Promise(resolve => setTimeout(resolve, 2000));
   
       const response = await axios.post<SignupResponse>('/api/users/signup', {
         name,
@@ -68,17 +79,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const newUser = response.data.user;
       setUser(newUser);
       localStorage.setItem('tdeeUser', JSON.stringify(newUser));
-      return true; // Return true if signup is successful
+      return true;
     } catch (err: any) {
       console.error('Signup failed:', err.response?.data || err.message);
-      
-      // Handle specific error messages based on the error response
+  
       if (err.response?.data?.error === 'User already exists') {
-        return 'Email already exists'; // Specific error for duplicate email
+        return 'Email already exists';
       } else {
-        console.error('Signup failed:', err.response?.data || err.message);
-        return 'An error occurred during signup. Please try again.'; // Generic error message
+        return 'An error occurred during signup. Please try again.';
       }
+    } finally {
+      setIsLoading(false); // Stop loading
     }
   };
   

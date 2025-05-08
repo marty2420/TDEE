@@ -14,15 +14,17 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="bg-blue-600 text-white shadow-md">
+<nav className="text-white shadow-md" style={{ backgroundColor: '#3C5C54' }}>
+
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <Link to="/" className="flex items-center space-x-2 text-xl font-bold">
-          <ActivityIcon size={24} />
-          <span>MacroMeter</span>
-        </Link>
+       <div className="flex items-center space-x-2 text-xl font-bold cursor-default">
+  <ActivityIcon size={24} />
+  <span>MacroMeter</span>
+</div>
+
         <div className="flex items-center space-x-4">
           {user ? (
-            location.pathname === '/dashboard' ? (  // Check if we're on the dashboard page
+            location.pathname === '/dashboard' ? ( // Check if we're on the dashboard page
               <>
                 <Link to="/dashboard" className="flex items-center space-x-1 hover:text-blue-200">
                   <UserIcon size={18} />
@@ -34,18 +36,16 @@ const Navbar: React.FC = () => {
                 </button>
               </>
             ) : (
-              <>
-                <Link to="/login" className="hover:text-blue-200">
-                  Login
-                </Link>
-                <Link to="/signup" className="bg-white text-blue-600 px-3 py-1 rounded-md hover:bg-blue-100">
-                  Sign Up
-                </Link>
-              </>
+              <></> // Don't show anything else for logged-in users who aren't on the dashboard
             )
           ) : (
             <>
-              
+              <Link to="/login" className="hover:text-blue-200">
+                Login
+              </Link>
+              <Link to="/signup" className="bg-white text-[#3C5C54] px-3 py-1 rounded-md hover:bg-[#c1ccc8] transition-colors duration-200"> 
+              Sign Up
+              </Link>
             </>
           )}
         </div>

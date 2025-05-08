@@ -71,9 +71,14 @@ const LoginForm: React.FC = () => {
             </button>
           </div>
         </div>
-        <button type="submit" disabled={isLoading} className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50">
-          {isLoading ? 'Logging in...' : 'Login'}
-        </button>
+        <button
+  type="submit"
+  disabled={isLoading}
+  className="w-full bg-[#3C5C54] text-white py-2 px-4 rounded-md hover:bg-[#2f4b44] focus:outline-none focus:ring-2 focus:ring-[#3C5C54] focus:ring-offset-2 disabled:opacity-50 transition-colors duration-200"
+>
+  {isLoading ? 'Logging in...' : 'Login'}
+</button>
+
       </form>
     </div>;
 };

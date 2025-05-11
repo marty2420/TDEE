@@ -23,41 +23,50 @@ const TdeeCalculator: React.FC = () => {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true); // Start loading
-    
-    // Calculate TDEE
-    setTimeout(async () => {
-      const calculatedResults = await calculateTDEE(formData);
-      setResults(calculatedResults);
-      setIsLoading(false); // Stop loading
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setIsLoading(true); // Start loading
 
-      // Save the data to the backend
-      try {
-        const userId = '681c964b5efef7e3ec40d66a'; // Replace with the actual user ID from your authentication state
-        const response = await fetch('/api/users/tdee', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            userId,
-              input: formData, 
-            tdeeResults: calculatedResults, // Send the TDEE results to be saved
-          }),
-        });
+  // Calculate TDEE
+  setTimeout(async () => {
+    const calculatedResults = await calculateTDEE(formData);
+    setResults(calculatedResults);
+    setIsLoading(false); // Stop loading
 
-        if (response.ok) {
-          console.log('Data saved successfully');
-        } else {
-          console.error('Error saving data');
-        }
-      } catch (err) {
-        console.error('Error while saving data:', err);
+    // Get the user ID and token from localStorage or your app state
+    const userId = JSON.parse(localStorage.getItem('tdeeUser') || '{}').id; // Extract user ID from the saved user
+    const token = localStorage.getItem('tdeeToken'); // Get the saved token from localStorage
+
+    if (!userId || !token) {
+      console.error('User is not authenticated');
+      return;
+    }
+
+    // Save the data to the backend
+    try {
+      const response = await fetch('/api/users/tdee', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Add the token in the header
+        },
+        body: JSON.stringify({
+          userId,
+          input: formData, // Send input data (age, weight, height, etc.)
+          tdeeResults: calculatedResults, // Send TDEE results to be saved
+        }),
+      });
+
+      if (response.ok) {
+        console.log('Data saved successfully');   
+      } else {
+        console.error('Error saving data');
       }
-    }, 2000); // Adjust the time delay as needed
-  };
+    } catch (err) {
+      console.error('Error while saving data:', err);
+    }
+  }, 2000); // Adjust the time delay as needed
+};
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">

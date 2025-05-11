@@ -36,35 +36,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     setIsLoading(false);
   }, []);
-
-  const login = async (email: string, password: string): Promise<boolean> => {
-    setIsLoading(true); // Start loading
-    try {
-      interface LoginResponse {
-        user: User;
-      }
-  
-      // Simulated delay para sa loading state (e.g. 2 seconds)
-      await new Promise(resolve => setTimeout(resolve, 2000));
-  
-      const response = await axios.post<LoginResponse>('/api/users/login', { email, password });
-      const loggedInUser = response.data.user;
-      setUser(loggedInUser);
-      localStorage.setItem('tdeeUser', JSON.stringify(loggedInUser));
-      return true;
-    } catch (err) {
-      console.error('Login failed:', email, password, err);
-      return false;
-    } finally {
-      setIsLoading(false); // Stop loading
+const login = async (email: string, password: string): Promise<boolean> => {
+  setIsLoading(true);
+  try {
+    interface LoginResponse {
+      user: User;
+      token: string; // <- Add this
     }
-  };
-  
+
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    const response = await axios.post<LoginResponse>('/api/users/login', { email, password });
+    const { user: loggedInUser, token } = response.data; // <- Destructure both user and token
+
+    setUser(loggedInUser);
+
+    // Save both to localStorage
+    localStorage.setItem('tdeeUser', JSON.stringify(loggedInUser));
+    localStorage.setItem('tdeeToken', token); // <- Save the token for future authenticated requests
+
+    return true;
+  } catch (err) {
+    console.error('Login failed:', email, password, err);
+    return false;
+  } finally {
+    setIsLoading(false);
+  }
+};
+
   const signup = async (name: string, email: string, password: string): Promise<boolean | string> => {
     setIsLoading(true); // Start loading
     try {
       interface SignupResponse {
         user: User;
+        token: string; 
       }
   
       // Simulated delay (2 seconds)
@@ -79,6 +84,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const newUser = response.data.user;
       setUser(newUser);
       localStorage.setItem('tdeeUser', JSON.stringify(newUser));
+      localStorage.setItem('tdeeToken', response.data.token);
       return true;
     } catch (err: any) {
       console.error('Signup failed:', err.response?.data || err.message);
@@ -96,6 +102,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     setUser(null);
     localStorage.removeItem('tdeeUser');
+    localStorage.removeItem('tdeeToken'); // Remove the token as well
   };
 
   return (

@@ -182,7 +182,7 @@ const SignupForm: React.FC = () => {
 </button>
       </form>
     </div>
-  );
+  );  
 };
 
 export default SignupForm;

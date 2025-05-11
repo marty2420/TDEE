@@ -6,7 +6,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:3000',  // Allow the React app to make requests
+  origin: 'http://localhost:5173',  // Allow the React app to make requests
   methods: ['GET', 'POST', 'PUT', 'DELETE'],  
   credentials: true,
 }));

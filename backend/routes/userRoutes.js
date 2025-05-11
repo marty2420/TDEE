@@ -1,11 +1,22 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
+const authenticateToken = require('../middleware/authMiddleware');  // Import the middleware
+const jwt = require('jsonwebtoken');
+
+
+const generateToken = (userId) => {
+    return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+    expiresIn: '7d', // You can adjust the expiry time as needed
+  });
+};
+
 
 const router = express.Router();
+
 // Login route
 router.post('/login', async (req, res) => {
-  console.log('🔥 /login route hit');
+  console.log('login asd');
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -20,7 +31,7 @@ router.post('/login', async (req, res) => {
 
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
     if (!isPasswordValid) {
-      return res.status(401).json({ error: 'Invalidddd email or password' });
+      return res.status(401).json({ error: 'Invalid email or password' });
     }
 
     const userResponse = {
@@ -35,16 +46,24 @@ router.post('/login', async (req, res) => {
       goal: user.goal
     };
 
-    res.status(200).json({ message: 'Login successful', user: userResponse });
+    // Generate a JWT token after successful login
+    const token = generateToken(user._id);
+
+    res.status(200).json({
+      message: 'Login successful',
+      user: userResponse,
+      token  // Send the token in response
+    });
   } catch (err) {
     console.error('Error during login:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
 
+
 // Signup route
 router.post('/signup', async (req, res) => {
-  console.log('🔥 /signup route hit');
+  console.log('asd signup');
   const { name, email, password, age, gender, weight, height, activityLevel, goal } = req.body;
 
   // Validate input
@@ -103,10 +122,10 @@ router.post('/signup', async (req, res) => {
   }
 });
 // Update TDEE input + results
-router.put('/tdee', async (req, res) => {
-  console.log('🔥 /tdee route hit');
-  const { userId, input, tdeeResults } = req.body;
 
+router.put('/tdee', async (req, res) => {
+  console.log('asd tdee');
+  const { userId, input, tdeeResults } = req.body;
   if (!userId || !input || !tdeeResults) {
     return res.status(400).json({ error: 'User ID, input, and TDEE results are required' });
   }
@@ -114,13 +133,9 @@ router.put('/tdee', async (req, res) => {
   try {
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      {
-        input,        // saves age, gender, weight, etc.
-        tdeeResults   // saves BMR, TDEE, etc.
-      },
+      { input, tdeeResults },
       { new: true }
     );
-
     if (!updatedUser) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -130,10 +145,12 @@ router.put('/tdee', async (req, res) => {
       user: updatedUser
     });
   } catch (err) {
-    console.error('❌ Error updating TDEE:', err);
+    console.error('Error updating TDEE:', err);
     res.status(500).json({ error: 'Server error while saving TDEE data' });
   }
 });
-
+router.get('/ping', (req, res) => {
+  res.send('pong');
+});
 
 module.exports = router;

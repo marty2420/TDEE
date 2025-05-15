@@ -5,6 +5,22 @@ interface User {
   id: string;
   name: string;
   email: string;
+  input?: {
+    age?: number;
+    gender?: string;
+    weight?: number;
+    height?: number;
+    activityLevel?: string;
+    goal?: string;
+  };
+  tdeeResults?: {
+    bmr: number;
+    tdee: number;
+    targetCalories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+  };
 }
 
 interface AuthContextType {
@@ -12,6 +28,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>;
   signup: (name: string, email: string, password: string) => Promise<boolean | string>;
   logout: () => void;
+  updateUser: (newUser: User) => void;   // <--- Add this
   isLoading: boolean;
 }
 
@@ -36,6 +53,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     setIsLoading(false);
   }, []);
+
+  const updateUser = (newUser: User) => {
+    setUser(newUser);
+    localStorage.setItem('tdeeUser', JSON.stringify(newUser));
+  };
+
 const login = async (email: string, password: string): Promise<boolean> => {
   setIsLoading(true);
   try {
@@ -106,7 +129,7 @@ const login = async (email: string, password: string): Promise<boolean> => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, signup, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, login, signup, logout, updateUser, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

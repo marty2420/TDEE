@@ -4,7 +4,6 @@ const cors = require('cors');
 require('dotenv').config();
 const app = express();
 
-// Middleware
 app.use(cors({
   origin: 'http://localhost:5173',  // Allow the React app to make requests
   methods: ['GET', 'POST', 'PUT', 'DELETE'],  
@@ -17,7 +16,7 @@ app.use(express.json());
 const userRoutes = require('./routes/userRoutes');
 
 // Use Routes
-app.use('/api/users', userRoutes);  // Prefix all user-related routes with /api/users
+app.use('/api/users', userRoutes);  
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)

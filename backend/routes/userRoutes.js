@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const authenticateToken = require('../middleware/authMiddleware');  // Import the middleware
 const jwt = require('jsonwebtoken');
+const { input } = require('framer-motion/client');
 
 
 const generateToken = (userId) => {
@@ -38,12 +39,8 @@ router.post('/login', async (req, res) => {
       id: user._id,
       name: user.name,
       email: user.email,
-      age: user.age,
-      gender: user.gender,
-      weight: user.weight,
-      height: user.height,
-      activityLevel: user.activityLevel,
-      goal: user.goal
+      input: user.input || {},           // nested input object
+      tdeeResults: user.tdeeResults || {} // nested tdeeResults object
     };
 
     // Generate a JWT token after successful login
@@ -83,35 +80,33 @@ router.post('/signup', async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10); // Hash password
 
+    // Save input data nested under input object
     const newUser = new User({
       name,
       email,
       passwordHash: hashedPassword,
-      age,
-      gender,
-      weight,
-      height,
-      activityLevel,
-      goal
+      input: {
+        age,
+        gender,
+        weight,
+        height,
+        activityLevel,
+        goal
+      },
+      tdeeResults: {} // initialize empty TDEE results
     });
 
-
     await newUser.save().catch(err => {
-        console.error('Mongoose validation error:', err);
-        return res.status(400).json({ error: 'Validation failed', details: err.message });
-      });
-      
+      console.error('Mongoose validation error:', err);
+      return res.status(400).json({ error: 'Validation failed', details: err.message });
+    });
 
     const userResponse = {
       id: newUser._id,
       name: newUser.name,
       email: newUser.email,
-      age: newUser.age,
-      gender: newUser.gender,
-      weight: newUser.weight,
-      height: newUser.height,
-      activityLevel: newUser.activityLevel,
-      goal: newUser.goal
+      input: newUser.input,
+      tdeeResults: newUser.tdeeResults,
     };
 
     res.status(201).json({ message: 'Account created successfully', user: userResponse });
@@ -122,12 +117,13 @@ router.post('/signup', async (req, res) => {
   }
 });
 // Update TDEE input + results
-
-router.put('/tdee', async (req, res) => {
+router.put('/tdee', authenticateToken, async (req, res) => {
   console.log('asd tdee');
-  const { userId, input, tdeeResults } = req.body;
-  if (!userId || !input || !tdeeResults) {
-    return res.status(400).json({ error: 'User ID, input, and TDEE results are required' });
+  const { input, tdeeResults } = req.body;
+  const userId = req.user.id;
+
+  if (!input || !tdeeResults) {
+    return res.status(400).json({ error: 'Input and TDEE results are required' });
   }
 
   try {
@@ -136,21 +132,35 @@ router.put('/tdee', async (req, res) => {
       { input, tdeeResults },
       { new: true }
     );
+
     if (!updatedUser) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    res.status(200).json({
-      message: 'TDEE data saved successfully',
-      user: updatedUser
-    });
+    // OPTIONAL: remove sensitive data like password
+    const { password, ...safeUser } = updatedUser.toObject();
+
+    return res.status(200).json(safeUser); // ← Return updated user directly
   } catch (err) {
     console.error('Error updating TDEE:', err);
     res.status(500).json({ error: 'Server error while saving TDEE data' });
   }
 });
-router.get('/ping', (req, res) => {
-  res.send('pong');
+
+router.get('/tdee/:userId', authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    res.json({
+      input: user.input,  
+      tdeeResults: user.tdeeResults,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
 });
 
-module.exports = router;
+
+module.exports = router;  

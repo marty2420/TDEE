@@ -22,11 +22,13 @@ const Dashboard: React.FC = () => {
   if (!user) {
     return null; // Will redirect in useEffect
   }
+
+
   return <div className="max-w-6xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start gap-8">
         <div className="w-full md:w-1/3">
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-            <div className="flex items-center space-x-4 mb-4">
+            <div className="flex items-center space-x-4 mb-4">    
               <div className="bg-blue-100 p-3 rounded-full">
                 <UserIcon size={24} className="text-blue-600" />
               </div>
@@ -48,6 +50,20 @@ const Dashboard: React.FC = () => {
               Track your nutrition journey and body composition changes over
               time.
             </p>
+<div className="grid grid-cols-2 gap-4 text-sm text-gray-700">
+  <p><strong>Age:</strong> {user.input?.age} yrs</p>
+  <p><strong>Gender:</strong> {user.input?.gender}</p>
+  <p><strong>Weight:</strong> {user.input?.weight} kg</p>
+  <p><strong>Height:</strong> {user.input?.height} cm</p>
+  <p><strong>Activity Level:</strong> {user.input?.activityLevel}</p>
+  <p><strong>Goal:</strong> {user.input?.goal}</p>
+  <p><strong>BMR:</strong> {user.tdeeResults?.bmr} kcal</p>
+  <p><strong>TDEE:</strong> {user.tdeeResults?.tdee} kcal</p>
+  <p><strong>Target Calories:</strong> {user.tdeeResults?.targetCalories} kcal</p>
+  <p><strong>Protein:</strong> {user.tdeeResults?.protein} g</p>
+  <p><strong>Carbs:</strong> {user.tdeeResults?.carbs} g</p>
+  <p><strong>Fat:</strong> {user.tdeeResults?.fat} g</p>
+</div>
             <div className="bg-blue-50 border border-blue-100 rounded-md p-4">
               <p className="text-sm text-blue-700">
                 This feature is coming soon! You'll be able to log your weight,

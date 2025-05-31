@@ -52,18 +52,19 @@ const TdeeCalculator: React.FC = () => {
     }
 
     // Save TDEE data to backend
-    const response = await fetch('/api/users/tdee', {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        userId,
-        input: formData,
-        tdeeResults: calculatedResults,
-      }),
-    });
+   const response = await fetch('/api/users/tdee', {
+  method: 'POST',  // instead of PUT
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`,
+  },
+  body: JSON.stringify({
+    userId,
+    input: formData,
+    tdeeResults: calculatedResults,
+  }),
+});
+
 
     if (!response.ok) {
       console.error('Failed to save TDEE data');

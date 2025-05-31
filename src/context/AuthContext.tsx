@@ -68,8 +68,8 @@ const login = async (email: string, password: string): Promise<boolean> => {
     }
 
     await new Promise(resolve => setTimeout(resolve, 2000));
-
-    const response = await axios.post<LoginResponse>('/api/users/login', { email, password });
+    const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    const response = await axios.post<LoginResponse>(`${BASE_URL}/api/users/login`, { email, password });
     const { user: loggedInUser, token } = response.data; // <- Destructure both user and token
 
     setUser(loggedInUser);

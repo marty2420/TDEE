@@ -18,6 +18,7 @@ const router = express.Router();
 // Login route
 router.post('/login', async (req, res) => {
   console.log('login asd');
+  
   const { email, password } = req.body;
 
   if (!email || !password) {

@@ -76,7 +76,8 @@ const TdeeCalculator: React.FC = () => {
     }
 
     // Fetch latest data from backend
-    const latestDataRes = await fetch(`/api/users/tdee/${userId}`, {
+
+    const latestDataRes = await fetch(`${API_BASE_URL}/api/users/tdee/${userId}`, {
       headers: {
         'Authorization': `Bearer ${token}`,
       },

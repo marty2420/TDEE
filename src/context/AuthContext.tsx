@@ -97,8 +97,8 @@ const login = async (email: string, password: string): Promise<boolean> => {
   
       // Simulated delay (2 seconds)
       await new Promise(resolve => setTimeout(resolve, 2000));
-  
-      const response = await axios.post<SignupResponse>('/api/users/signup', {
+      const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await axios.post<SignupResponse>(`${BASE_URL}/api/users/signup`, {
         name,
         email,
         password

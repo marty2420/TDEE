@@ -5,7 +5,7 @@ const app = express();
 require('dotenv').config();
 
 app.use(cors({
-  origin: 'https://tdeecalc-r02u.onrender.com',  // Allow the React app to make requests
+  origin: 'http://localhost:5173',  // Allow the React app to make requests
   methods: ['GET', 'POST', 'PUT', 'DELETE'],  
   credentials: true,
 }));

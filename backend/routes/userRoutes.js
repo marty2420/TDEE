@@ -61,7 +61,17 @@ router.post('/login', async (req, res) => {
 // Signup route
 router.post('/signup', async (req, res) => {
   console.log('asd signup');
-  const { name, email, password, age, gender, weight, height, activityLevel, goal } = req.body;
+  const { 
+    name, 
+    email, 
+    password, 
+    age, 
+    gender, 
+    weight, 
+    height, 
+    activityLevel, 
+    goal }
+     = req.body;
 
   // Validate input
   if (!name || !email || !password) {

@@ -52,7 +52,7 @@ const TdeeCalculator: React.FC = () => {
     }
 
     // Save TDEE data to backend
-   const response = await fetch('${API_BASE_URL}/api/users/tdee', {
+   const response = await fetch('/api/users/tdee', {
   method: 'PUT',  // instead of PUT
   headers: {
     'Content-Type': 'application/json',

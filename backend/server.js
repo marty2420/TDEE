@@ -6,7 +6,7 @@ require('dotenv').config();
 
 const allowedOrigins = [
   'http://localhost:5173',
-  'https://super-marigold-e1061a.netlify.app'
+  'https://macrometer-calc.netlify.app'
 ];
 
 app.use(cors({

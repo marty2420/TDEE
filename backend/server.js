@@ -13,7 +13,7 @@ app.use(express.json());
 
 
 // Import Routes
-const userRoutes = require('../backend/routes/userRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 // Use Routes
 app.use('/api/users', userRoutes);  

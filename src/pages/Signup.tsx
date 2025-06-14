@@ -1,8 +1,9 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import SignupForm from '../components/auth/SignupForm';
+import React from "react";
+import { Link } from "react-router-dom";
+import SignupForm from "../components/auth/SignupForm";
 const Signup: React.FC = () => {
-  return <div className="max-w-screen-xl mx-auto py-12">
+  return (
+    <div className="max-w-screen-xl mx-auto py-12">
       <div className="flex flex-col md:flex-row gap-12">
         <div className="flex-1">
           <h1 className="text-3xl font-bold mb-4">Create your account</h1>
@@ -12,8 +13,11 @@ const Signup: React.FC = () => {
           </p>
           <SignupForm />
           <p className="text-center mt-6">
-            Already have an account?{' '}
-            <Link to="/login" className="text-blue-600 hover:text-[#7aa59b] hover:underline transition-colors duration-200">
+            Already have an account?{" "}
+            <Link
+              to="/login"
+              className="text-blue-600 hover:text-[#7aa59b] hover:underline transition-colors duration-200"
+            >
               Log in
             </Link>
           </p>
@@ -54,6 +58,7 @@ const Signup: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
 export default Signup;

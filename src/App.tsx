@@ -1,19 +1,24 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import Home from './pages/Home';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import Dashboard from './pages/Dashboard';
-import Layout from './components/Layout';
-import { AuthProvider } from './context/AuthContext';
-import { TdeeProvider } from './context/TdeeContext.tsx'; // ✅ Import TdeeProvider
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { motion } from "framer-motion";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import Dashboard from "./pages/Dashboard";
+import Layout from "./components/Layout";
+import { AuthProvider } from "./context/AuthContext";
+import { TdeeProvider } from "./context/TdeeContext.tsx"; // ✅ Import TdeeProvider
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export function App() {
   return (
     <AuthProvider>
-      <TdeeProvider> {/* ✅ Wrap the app with TdeeProvider */}
+      <TdeeProvider>
         <Router>
           <Layout>
+            {/* ToastContainer outside Routes to stay persistent across pages */}
+            <ToastContainer position="top-center" autoClose={3000} />
+
             <Routes>
               <Route
                 path="/"

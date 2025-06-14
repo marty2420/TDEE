@@ -1,129 +1,140 @@
-import React, { useState } from 'react';
-import { useTdee } from '../../context/TdeeContext';  // <-- Import context hook
-import { ArrowRightIcon } from 'lucide-react';
-import { TdeeInputs, calculateTDEE, TdeeResults } from '../../utils/tdeeCalculator';
-import ResultsDisplay from './ResultsDisplay';
-import { useAuth } from '../../context/AuthContext';
-
+import React, { useState } from "react";
+import { useTdee } from "../../context/TdeeContext"; // <-- Import context hook
+import { ArrowRightIcon } from "lucide-react";
+import {
+  TdeeInputs,
+  calculateTDEE,
+  TdeeResults,
+} from "../../utils/tdeeCalculator";
+import ResultsDisplay from "./ResultsDisplay";
+import { useAuth } from "../../context/AuthContext";
 
 const TdeeCalculator: React.FC = () => {
   const [formData, setFormData] = useState<TdeeInputs>({
     age: 30,
-    gender: 'male',
+    gender: "male",
     weight: 70,
     height: 175,
-    activityLevel: 'moderate',
-    goal: 'maintain',
+    activityLevel: "moderate",
+    goal: "maintain",
   });
   const [results, setResults] = useState<TdeeResults | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const { setIsUpdating } = useTdee();
-  const { updateUser } = useAuth();  
+  const { updateUser } = useAuth();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === 'age' || name === 'weight' || name === 'height' ? parseFloat(value) : value,
+      [name]:
+        name === "age" || name === "weight" || name === "height"
+          ? parseFloat(value)
+          : value,
     }));
   };
 
- const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setIsLoading(true);
-  setIsUpdating(true); // Start dashboard loading
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setIsUpdating(true); // Start dashboard loading
 
-  const MIN_LOADING_TIME = 2000; // 4 seconds minimum loading time
-  const startTime = Date.now();
+    const MIN_LOADING_TIME = 2000; // 4 seconds minimum loading time
+    const startTime = Date.now();
 
-  try {
-    const calculatedResults = await calculateTDEE(formData);
-    setResults(calculatedResults);
+    try {
+      const calculatedResults = await calculateTDEE(formData);
+      setResults(calculatedResults);
 
-    const userId = JSON.parse(localStorage.getItem('tdeeUser') || '{}').id;
-    const token = localStorage.getItem('tdeeToken');
+      const userId = JSON.parse(localStorage.getItem("tdeeUser") || "{}").id;
+      const token = localStorage.getItem("tdeeToken");
 
-    if (!userId || !token) {
-      console.error('User is not authenticated');
-      setIsLoading(false);
-      setIsUpdating(false);
-      return;
-    }
-
-    // Save TDEE data to backend
-
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-  const response = await fetch(`${API_BASE_URL}/api/users/tdee`, {
-  method: 'PUT',  // instead of PUT
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
-  },
-  body: JSON.stringify({
-    userId,
-    input: formData,
-    tdeeResults: calculatedResults,
-  }),
-});
-
-
-    if (!response.ok) {
-      console.error('Failed to save TDEE data');
-      setIsLoading(false);
-      setIsUpdating(false);
-      return;
-    }
-
-    // Fetch latest data from backend
-
-    const latestDataRes = await fetch(`${API_BASE_URL}/api/users/tdee/${userId}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-
-    if (!latestDataRes.ok) {
-      console.error('Failed to fetch latest TDEE data');
-      setIsLoading(false);
-      setIsUpdating(false);
-      return;
-    }
-
-    const latestData = await latestDataRes.json();
-
-    // Update localStorage with latest data
-    const currentUser = JSON.parse(localStorage.getItem('tdeeUser') || '{}');
-    const updatedUser = {
-      ...currentUser,
-      input: latestData.input,
-      tdeeResults: latestData.tdeeResults,
-    };
-
-    localStorage.setItem('tdeeUser', JSON.stringify(updatedUser));
-    updateUser(updatedUser);
-    console.log('Updated user data saved locally and state updated:', updatedUser);
-
-    
-    const elapsed = Date.now() - startTime;
-    const remainingTime = MIN_LOADING_TIME - elapsed;
-
-    if (remainingTime > 0) {
-      setTimeout(() => {
+      if (!userId || !token) {
+        console.error("User is not authenticated");
         setIsLoading(false);
         setIsUpdating(false);
-      }, remainingTime);
-    } else {
+        return;
+      }
+
+      // Save TDEE data to backend
+
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await fetch(`${API_BASE_URL}/api/users/tdee`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          userId,
+          input: formData,
+          tdeeResults: calculatedResults,
+        }),
+      });
+
+      if (!response.ok) {
+        console.error("Failed to save TDEE data");
+        setIsLoading(false);
+        setIsUpdating(false);
+        return;
+      }
+
+      // Fetch latest data from backend
+
+      const latestDataRes = await fetch(
+        `${API_BASE_URL}/api/users/tdee/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!latestDataRes.ok) {
+        console.error("Failed to fetch latest TDEE data");
+        setIsLoading(false);
+        setIsUpdating(false);
+        return;
+      }
+
+      const latestData = await latestDataRes.json();
+
+      // Update localStorage with latest data
+      const currentUser = JSON.parse(localStorage.getItem("tdeeUser") || "{}");
+      const updatedUser = {
+        ...currentUser,
+        input: latestData.input,
+        tdeeResults: latestData.tdeeResults,
+      };
+
+      localStorage.setItem("tdeeUser", JSON.stringify(updatedUser));
+      updateUser(updatedUser);
+      console.log(
+        "Updated user data saved locally and state updated:",
+        updatedUser
+      );
+
+      const elapsed = Date.now() - startTime;
+      const remainingTime = MIN_LOADING_TIME - elapsed;
+
+      if (remainingTime > 0) {
+        setTimeout(() => {
+          setIsLoading(false);
+          setIsUpdating(false);
+        }, remainingTime);
+      } else {
+        setIsLoading(false);
+        setIsUpdating(false);
+      }
+    } catch (err) {
+      console.error("Error while saving/fetching:", err);
       setIsLoading(false);
       setIsUpdating(false);
     }
-  } catch (err) {
-    console.error('Error while saving/fetching:', err);
-    setIsLoading(false);
-    setIsUpdating(false);
-  }
-};
-
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
@@ -133,7 +144,9 @@ const TdeeCalculator: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             {/* Input Fields */}
             <div>
-              <label className="block text-gray-700 mb-2" htmlFor="age">Age</label>
+              <label className="block text-gray-700 mb-2" htmlFor="age">
+                Age
+              </label>
               <input
                 type="number"
                 id="age"
@@ -146,7 +159,9 @@ const TdeeCalculator: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block text-gray-700 mb-2" htmlFor="gender">Gender</label>
+              <label className="block text-gray-700 mb-2" htmlFor="gender">
+                Gender
+              </label>
               <select
                 id="gender"
                 name="gender"
@@ -159,7 +174,9 @@ const TdeeCalculator: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="block text-gray-700 mb-2" htmlFor="weight">Weight (kg)</label>
+              <label className="block text-gray-700 mb-2" htmlFor="weight">
+                Weight (kg)
+              </label>
               <input
                 type="number"
                 id="weight"
@@ -173,7 +190,9 @@ const TdeeCalculator: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block text-gray-700 mb-2" htmlFor="height">Height (cm)</label>
+              <label className="block text-gray-700 mb-2" htmlFor="height">
+                Height (cm)
+              </label>
               <input
                 type="number"
                 id="height"
@@ -187,7 +206,12 @@ const TdeeCalculator: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block text-gray-700 mb-2" htmlFor="activityLevel">Activity Level</label>
+              <label
+                className="block text-gray-700 mb-2"
+                htmlFor="activityLevel"
+              >
+                Activity Level
+              </label>
               <select
                 id="activityLevel"
                 name="activityLevel"
@@ -195,15 +219,23 @@ const TdeeCalculator: React.FC = () => {
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="sedentary">Sedentary (little or no exercise)</option>
+                <option value="sedentary">
+                  Sedentary (little or no exercise)
+                </option>
                 <option value="light">Light (exercise 1-3 days/week)</option>
-                <option value="moderate">Moderate (exercise 3-5 days/week)</option>
+                <option value="moderate">
+                  Moderate (exercise 3-5 days/week)
+                </option>
                 <option value="active">Active (exercise 6-7 days/week)</option>
-                <option value="very_active">Very Active (hard exercise & physical job)</option>
+                <option value="very_active">
+                  Very Active (hard exercise & physical job)
+                </option>
               </select>
             </div>
             <div>
-              <label className="block text-gray-700 mb-2" htmlFor="goal">Goal</label>
+              <label className="block text-gray-700 mb-2" htmlFor="goal">
+                Goal
+              </label>
               <select
                 id="goal"
                 name="goal"

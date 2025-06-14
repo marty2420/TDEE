@@ -1,8 +1,9 @@
-import * as React from 'react';
-import { Link } from 'react-router-dom';
-import { ActivityIcon, CalculatorIcon, SaveIcon } from 'lucide-react';
+import * as React from "react";
+import { Link } from "react-router-dom";
+import { ActivityIcon, CalculatorIcon, SaveIcon } from "lucide-react";
 const Home: React.FC = () => {
-  return <div className="max-w-6xl mx-auto">
+  return (
+    <div className="max-w-6xl mx-auto">
       <section className="py-12 md:py-20">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
@@ -13,14 +14,17 @@ const Home: React.FC = () => {
             Expenditure and provides personalized nutrition recommendations
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
-          <Link
-  to="/signup"
-  className="bg-[#3C5C54] hover:bg-[#4D6C5B] text-white px-6 py-3 rounded-md font-medium text-lg transition-colors duration-300"
->
-  Get Started
-</Link>
+            <Link
+              to="/signup"
+              className="bg-[#3C5C54] hover:bg-[#4D6C5B] text-white px-6 py-3 rounded-md font-medium text-lg transition-colors duration-300"
+            >
+              Get Started
+            </Link>
 
-            <Link to="/login" className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-800 px-6 py-3 rounded-md font-medium text-lg">
+            <Link
+              to="/login"
+              className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-800 px-6 py-3 rounded-md font-medium text-lg"
+            >
               Sign In
             </Link>
           </div>
@@ -118,6 +122,7 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
-    </div>;
+    </div>
+  );
 };
 export default Home;

@@ -1,11 +1,14 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
 
 const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     passwordHash: { type: String, required: true },
+
+    // for forgot/reset password
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
 
     // tdee calculation results
     tdeeResults: {
@@ -16,6 +19,7 @@ const userSchema = new mongoose.Schema(
       carbs: Number,
       fat: Number,
     },
+
     input: {
       type: new mongoose.Schema(
         {

@@ -4,6 +4,7 @@ const User = require("../models/User");
 const authenticateToken = require("../middleware/authMiddleware");
 const { input } = require("framer-motion/client");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");  // << 
 
 const generateToken = (userId) => {
   return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
@@ -219,6 +220,80 @@ router.get("/tdee/:userId", authenticateToken, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
+  }
+});
+
+
+router.post('/forgot-password', async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Generate reset token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+
+    // Hash token before saving to DB (security!)
+    const resetTokenHashed = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+    // Save hashed token and expiry time to user document
+    user.resetPasswordToken = resetTokenHashed;
+    user.resetPasswordExpire = Date.now() + 3600000; // 1 hour from now
+
+    await user.save();
+
+    // Send resetToken (raw, unhashed) in the email reset link
+    const resetLink = `http://localhost:5173/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
+
+
+    // TODO: call your email sending function here with resetLink
+
+    res.json({ message: 'Reset link sent', resetToken });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+router.post('/reset-password', async (req, res) => {
+  const { email, token, newPassword } = req.body;
+
+  if (!email || !token || !newPassword) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  try {
+    // Hash the incoming token (the one from URL/email)
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    // Find user with matching reset token & check expiry
+    const user = await User.findOne({
+      email,
+      resetPasswordToken: hashedToken,
+      resetPasswordExpire: { $gt: Date.now() }, // token still valid
+    });
+
+    if (!user) {
+      return res.status(400).json({ error: 'Invalid or expired token' });
+    }
+
+    // Hash new password before saving
+    const salt = await bcrypt.genSalt(10);
+    user.passwordHash = await bcrypt.hash(newPassword, salt);
+
+    // Clear reset token fields
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save();
+
+    res.json({ message: 'Password reset successful. You can now log in!' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
   }
 });
 

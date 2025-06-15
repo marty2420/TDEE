@@ -241,7 +241,7 @@ router.post('/forgot-password', async (req, res) => {
 
     // Save hashed token and expiry time to user document
     user.resetPasswordToken = resetTokenHashed;
-    user.resetPasswordExpire = Date.now() + 3600000; // 1 hour from now
+    user.resetPasswordExpire = Date.now() + 300000; // 5 minutes from now
 
     await user.save();
 

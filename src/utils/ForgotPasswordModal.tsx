@@ -61,7 +61,7 @@ const ForgotPasswordModal: React.FC<Props> = ({ isOpen, onClose, onSubmitEmail }
     }
 
     // Use the token from backend response to build the reset link
-    const resetLink = `http://localhost:5173/reset-password?token=${data.resetToken}&email=${encodeURIComponent(email)}`;
+    const resetLink = `https://macrometer-calc.netlify.app/reset-password?token=${data.resetToken}&email=${encodeURIComponent(email)}`;
     
     // Then send the email with EmailJS (or you can move this to backend)
     await sendResetEmail(email, resetLink);

@@ -112,10 +112,10 @@ const TdeeCalculator: React.FC = () => {
 
       localStorage.setItem("tdeeUser", JSON.stringify(updatedUser));
       updateUser(updatedUser);
-      console.log(
-        "Updated user data saved locally and state updated:",
-        updatedUser
-      );
+      // console.log(
+      //   "Updated user data saved locally and state updated:",
+      //   updatedUser
+      // );
 
       const elapsed = Date.now() - startTime;
       const remainingTime = MIN_LOADING_TIME - elapsed;

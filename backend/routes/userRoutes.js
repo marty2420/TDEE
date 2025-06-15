@@ -246,7 +246,7 @@ router.post('/forgot-password', async (req, res) => {
     await user.save();
 
     // Send resetToken (raw, unhashed) in the email reset link
-    const resetLink = `http://localhost:5173/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
+    const resetLink = `https://macrometer-calc.netlify.app/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
 
 
     // TODO: call your email sending function here with resetLink

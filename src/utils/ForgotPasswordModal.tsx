@@ -48,7 +48,8 @@ const ForgotPasswordModal: React.FC<Props> = ({ isOpen, onClose, onSubmitEmail }
 
   try {
     // Call your backend forgot-password API to get the real reset token
-    const response = await fetch('/api/users/forgot-password', {
+    const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    const response = await fetch(`${BASE_URL}/api/users/forgot-password`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email }),

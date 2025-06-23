@@ -8,14 +8,13 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { jsPDF } from "jspdf";
 
-
 const Dashboard: React.FC = () => {
   const { user, logout } = useAuth();
   const { isUpdating } = useTdee();
   const [showWorkoutModal, setShowWorkoutModal] = useState(false);
   const [showAccountModal, setShowAccountModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [daysPerWeek, setDaysPerWeek] = useState(3);
+  const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const [hoursPerDay, setHoursPerDay] = useState(1);
   const [showSpinner, setShowSpinner] = useState(false);
   const [deleteInput, setDeleteInput] = useState("");
@@ -27,7 +26,10 @@ const Dashboard: React.FC = () => {
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
   const [showPasswords, setShowPasswords] = useState(false);
   const navigate = useNavigate();
-
+  const [isLoading, setIsLoading] = useState(false);
+  const [showGenerateButton, setShowGenerateButton] = useState(false);
+  const [workoutPlan, setWorkoutPlan] = useState<string | null>(null);
+  
   const handleLogout = () => {
     logout();
     navigate("/login");
@@ -124,8 +126,8 @@ const Dashboard: React.FC = () => {
       toast.warn("Account name does not match. Double-check and try again.");
     }
   };
-
-  const handleSaveWorkoutPrefs = async () => {
+  
+   const handleSaveWorkoutPrefs = async () => {
     try {
       const response = await fetch("/api/users/workout-prefs", {
         method: "PUT",
@@ -230,8 +232,7 @@ const handleDownloadPDF = () => {
   doc.save("Workout_Plan.pdf");
 };
 
-
-  return (
+ return (
     <div className="max-w-6xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start gap-8">
         <div className="w-full md:w-1/3">
@@ -320,7 +321,15 @@ const handleDownloadPDF = () => {
                       className="w-full bg-[#3C5C54] text-white py-2 px-4 rounded-md hover:bg-[#4D6C5B] focus:outline-none focus:ring-2 focus:ring-[#4D6C5B] focus:ring-offset-2 flex items-center justify-center transition-colors duration-300"
                     >
                       Click here!
-                    </button>
+                       </button>
+                    {showGenerateButton && (
+                      <button
+                        onClick={handleGenerateWorkoutPlan}
+                        className="mt-4 w-full bg-[#3C5C54] text-white py-2 rounded-md hover:bg-[#2f4b44] transition"
+                      >
+                        Generate Workout Plan
+                      </button>
+                    )}
                   </div>
                 </div>
               </>
@@ -375,7 +384,7 @@ const handleDownloadPDF = () => {
                     <span className="capitalize">{day}</span>
                   </label>
                 ))}
-              </select>
+              </div>
             </div>
 
             <div className="mb-6">
@@ -402,7 +411,10 @@ const handleDownloadPDF = () => {
               >
                 Cancel
               </button>
-              <button className="text-white py-2 px-4 rounded-md bg-[#3C5C54] hover:bg-[#4D6C5B] transition">
+                <button
+                onClick={handleSaveWorkoutPrefs} // you'll define this
+                className="text-white py-2 px-4 rounded-md bg-[#3C5C54] hover:bg-[#4D6C5B] transition"
+              >
                 OKAY
               </button>
             </div>
@@ -448,6 +460,11 @@ const handleDownloadPDF = () => {
         </button>
       </div>
     </div>
+  </div>
+)}
+{workoutPlan && (
+  <div id="workout-plan" className="mt-4 p-4 border rounded bg-gray-50">
+    <pre className="whitespace-pre-wrap">{workoutPlan}</pre>
   </div>
 )}
 

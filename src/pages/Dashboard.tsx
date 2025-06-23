@@ -129,7 +129,8 @@ const Dashboard: React.FC = () => {
   
    const handleSaveWorkoutPrefs = async () => {
     try {
-      const response = await fetch("/api/users/workout-prefs", {
+     const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+     const response = await fetch(`${API_BASE_URL}/api/users/workout-prefs`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -175,7 +176,8 @@ const handleGenerateWorkoutPlan = async () => {
   };
 
   try {
-    const res = await fetch("/api/users/generate-workout", {
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    const res = await fetch(`${API_BASE_URL}/api/users/generate-workout`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(userInput),

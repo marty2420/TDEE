@@ -321,14 +321,22 @@ router.put("/workout-prefs", async (req, res) => {
     }
 
     return res.status(200).json({
-      message: "Workout preferences updated",
-      workoutPrefs: updatedUser.workoutPrefs,
+      message: "Workout preferences updated ✅",
+      data: {
+        name: updatedUser.name,
+        email: updatedUser.email,
+        workoutPrefs: updatedUser.workoutPrefs,
+        input: updatedUser.input,
+        tdeeResults: updatedUser.tdeeResults,
+        updatedAt: updatedUser.updatedAt,
+      },
     });
   } catch (err) {
     console.error("Error updating workout preferences:", err);
     res.status(500).json({ error: "Server error while saving workout prefs" });
   }
 });
+
 
 
 router.post("/generate-workout", async (req, res) => {

@@ -7,7 +7,7 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");  // << 
 const { InferenceClient } = require("@huggingface/inference");
 
-const HF_TOKEN = import.meta.env.HF_TOKEN;
+const HF_TOKEN = process.env.HF_TOKEN;
 const hf = new InferenceClient(HF_TOKEN);
 
 generateToken = (userId) => {

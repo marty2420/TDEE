@@ -36,7 +36,7 @@ const Dashboard: React.FC = () => {
   };
   const handlePasswordChange = async () => {
     if (newPass !== confirmPass) {
-      toast.error("New passwords do not match!");
+      toast.error("New passwords do not match!!");
       return;
     }
 

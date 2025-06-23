@@ -332,20 +332,25 @@ router.put("/workout-prefs", async (req, res) => {
 
 
 router.post("/generate-workout", async (req, res) => {
- const age = req.body?.input?.age;
-const gender = req.body?.input?.gender;
-const goal = req.body?.input?.goal;
-const hoursPerDay = req.body?.workoutPrefs?.hoursPerDay;
-const selectedDays = req.body?.workoutPrefs?.selectedDays;
- if (
-  typeof age !== 'number' ||
-  !gender ||
-  !goal ||
-  typeof hoursPerDay !== 'number' ||
-  !Array.isArray(selectedDays) || selectedDays.length === 0
-) {
-  return res.status(400).json({ error: "Missing or invalid required fields" });
-}
+  console.log("BODY:", JSON.stringify(req.body, null, 2));
+
+  const age = req.body?.input?.age;
+  const gender = req.body?.input?.gender;
+  const goal = req.body?.input?.goal;
+  const hoursPerDay = req.body?.workoutPrefs?.hoursPerDay;
+  const selectedDays = req.body?.workoutPrefs?.selectedDays;
+
+  console.log({ age, gender, goal, hoursPerDay, selectedDays });
+
+  if (
+    typeof age !== 'number' ||
+    !gender ||
+    !goal ||
+    typeof hoursPerDay !== 'number' ||
+    !Array.isArray(selectedDays) || selectedDays.length === 0
+  ) {
+    return res.status(400).json({ error: "Missing or invalid required fields" });
+  }
 
   const prompt = `
 You are a fitness coach. Create a 1‑week workout plan for a ${age}-year-old ${gender} who wants to ${goal} weight. 

@@ -5,13 +5,15 @@ const authenticateToken = require("../middleware/authMiddleware");
 const { input } = require("framer-motion/client");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");  // << 
+const { InferenceClient } = require("@huggingface/inference");
 
-const generateToken = (userId) => {
+const hf = new InferenceClient(process.env.HF_TOKEN);
+
+generateToken = (userId) => {
   return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
     expiresIn: "7d", // You can adjust the expiry time as needed
   });
 };
-
 const router = express.Router();
 
 // Change password route
@@ -339,15 +341,14 @@ const selectedDays = req.body?.workoutPrefs?.selectedDays;
   }
 
   const prompt = `
-acc as a great and experienced fitness coach. Create a 1‑week workout plan for a ${age}-year-old ${gender} who wants to ${goal} weight. 
+You are a fitness coach. Create a 1‑week workout plan for a ${age}-year-old ${gender} who wants to ${goal} weight. 
 They can work out for ${hoursPerDay} hours on: ${selectedDays.join(", ")}. 
-Include warm‑up & cooldown. Format by day and exercise. just state the list of workout have an introduction like "based on your data heres a recommended workoutplan. use only the days selected  ".
+Include warm‑up & cooldown. Format by day and exercise. just state the list of workout have an introduction like "based on your data heres a recommended workoutplan".
   `;
 
   try {
     const out = await hf.chatCompletion({
-      
-      model: "meta-llama/Llama-3.1-8B-Instruct",  // pick any chat-capable HF model
+      model: "nanonets/Nanonets-OCR-s",  // pick any chat-capable HF model
       messages: [{ role: "user", content: prompt }],
       max_tokens: 30000,
     });

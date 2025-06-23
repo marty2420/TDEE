@@ -337,9 +337,15 @@ const gender = req.body?.input?.gender;
 const goal = req.body?.input?.goal;
 const hoursPerDay = req.body?.workoutPrefs?.hoursPerDay;
 const selectedDays = req.body?.workoutPrefs?.selectedDays;
-  if (!age || !gender || !goal || !hoursPerDay || !selectedDays) {
-    return res.status(400).json({ error: "Missing required fields" });
-  }
+ if (
+  typeof age !== 'number' ||
+  !gender ||
+  !goal ||
+  typeof hoursPerDay !== 'number' ||
+  !Array.isArray(selectedDays) || selectedDays.length === 0
+) {
+  return res.status(400).json({ error: "Missing or invalid required fields" });
+}
 
   const prompt = `
 You are a fitness coach. Create a 1‑week workout plan for a ${age}-year-old ${gender} who wants to ${goal} weight. 

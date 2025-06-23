@@ -7,7 +7,8 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");  // << 
 const { InferenceClient } = require("@huggingface/inference");
 
-const hf = new InferenceClient(process.env.HF_TOKEN);
+const HF_TOKEN = import.meta.env.HF_TOKEN;
+const hf = new InferenceClient(HF_TOKEN);
 
 generateToken = (userId) => {
   return jwt.sign({ id: userId }, process.env.JWT_SECRET, {

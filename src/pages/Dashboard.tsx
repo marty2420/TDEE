@@ -6,9 +6,11 @@ import { useTdee } from "../context/TdeeContext.tsx";
 import TdeeCalculator from "../components/calculator/TdeeCalculator";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { jsPDF } from "jspdf";
+
 
 const Dashboard: React.FC = () => {
-  const { user, isLoading, logout } = useAuth();
+  const { user, logout } = useAuth();
   const { isUpdating } = useTdee();
   const [showWorkoutModal, setShowWorkoutModal] = useState(false);
   const [showAccountModal, setShowAccountModal] = useState(false);
@@ -123,6 +125,112 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const handleSaveWorkoutPrefs = async () => {
+    try {
+      const response = await fetch("/api/users/workout-prefs", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user.id, // Use the user's unique identifier
+          workoutPrefs: {
+            selectedDays: selectedDays,
+            hoursPerDay: hoursPerDay,
+          },
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) throw new Error(data.error || "Something went wrong");
+
+      console.log("Saved workout prefs ✅", data);
+    } catch (err) {
+      if (err instanceof Error) {
+        console.error("Failed to save workout prefs ❌", err.message);
+      } else {
+        console.error("Failed to save workout prefs ❌", err);
+      }
+    } finally {
+      setShowWorkoutModal(false);
+      setShowGenerateButton(true);
+    }
+  };
+
+const handleGenerateWorkoutPlan = async () => {
+  setIsLoading(true); // Start loading
+  const userInput = {
+    input: {
+      age: user.input?.age,
+      gender: user.input?.gender,
+      goal: user.input?.goal,
+    },
+    workoutPrefs: {
+      hoursPerDay,
+      selectedDays,
+    },
+  };
+
+  try {
+    const res = await fetch("/api/users/generate-workout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(userInput),
+    });
+
+    const data = await res.json();
+    if (data.plan) setWorkoutPlan(data.plan);
+    else toast.error("Failed to generate plan");
+  } catch (error) {
+    toast.error("Something went wrong.");
+  } finally {
+    setIsLoading(false); // Stop loading
+  }
+};
+
+const handleDownloadPDF = () => {
+  if (!workoutPlan) return;
+
+  const doc = new jsPDF({
+    orientation: "portrait",
+    unit: "mm",
+    format: "a4",
+  });
+
+  const margin = 10;
+  const lineHeight = 7;
+  const pageHeight = 297; // A4 page height in mm
+  const maxLineWidth = 190;
+
+  // Split long text into lines that fit the page
+  const lines = doc.splitTextToSize(workoutPlan, maxLineWidth);
+
+  let y = margin;
+
+  // Add Title
+  doc.setFontSize(16);
+  doc.setFont("helvetica", "bold");
+  doc.text("Your AI-Generated Workout Plan", margin, y);
+  y += 10;
+
+  // Set content font
+  doc.setFontSize(12);
+  doc.setFont("helvetica", "normal");
+
+  lines.forEach((line: string) => {
+    if (y + lineHeight > pageHeight - margin) {
+      doc.addPage(); // Add new page if line overflows
+      y = margin;
+    }
+    doc.text(line, margin, y);
+    y += lineHeight;
+  });
+
+  doc.save("Workout_Plan.pdf");
+};
+
+
   return (
     <div className="max-w-6xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start gap-8">
@@ -225,8 +333,8 @@ const Dashboard: React.FC = () => {
           <TdeeCalculator />
         </div>
       </div>
+      
 
-      {/* Workout Plan Modal */}
       {showWorkoutModal && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-lg">
@@ -238,15 +346,34 @@ const Dashboard: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Days per Week
               </label>
-              <select
-                value={daysPerWeek}
-                onChange={(e) => setDaysPerWeek(Number(e.target.value))}
-                className="w-full border border-gray-300 rounded-md px-3 py-2"
-              >
-                {[...Array(7)].map((_, i) => (
-                  <option key={i} value={i + 1}>
-                    {i + 1} day(s)
-                  </option>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  "monday",            
+                  "Friday",
+                  "tuesday",
+                  "saturday",
+                  "Wednesday",
+                  "Sunday",
+                  "Thursday",
+                ].map((day) => (
+                  <label key={day} className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      value={day}
+                      checked={selectedDays.includes(day)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedDays([...selectedDays, day]);
+                        } else {
+                          setSelectedDays(
+                            selectedDays.filter((d) => d !== day)
+                          );
+                        }
+                      }}
+                      className="accent-[#3C5C54]"
+                    />
+                    <span className="capitalize">{day}</span>
+                  </label>
                 ))}
               </select>
             </div>
@@ -282,6 +409,47 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       )}
+      {isLoading && (
+  <div className="mt-4 text-center text-sm text-gray-500 animate-pulse">
+    GENERATING WORKOUT PLAN...
+  </div>
+)}
+
+{!isLoading && workoutPlan && (
+  <div id="workout-plan" className="mt-4 p-4 border rounded bg-gray-50 max-h-[500px] overflow-y-auto">
+    <pre className="whitespace-pre-wrap">{workoutPlan}</pre>
+  </div>
+)}
+{workoutPlan && (
+  <div
+    className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    onClick={() => setWorkoutPlan(null)}
+  >
+    <div
+      className="bg-white rounded-lg p-6 max-w-xl w-full max-h-[70vh] overflow-y-auto shadow-lg"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <h3 className="text-xl font-bold mb-4 text-center">Your Workout Plan</h3>
+      <pre id="workout-plan" className="whitespace-pre-wrap">{workoutPlan}</pre>
+
+      <div className="flex justify-center gap-4 mt-4">
+        <button
+          className="px-4 py-2 bg-[#3C5C54] text-white rounded hover:bg-[#4D6C5B] transition"
+          onClick={handleDownloadPDF}
+        >
+          Download PDF
+        </button>
+
+        <button
+          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition"
+          onClick={() => setWorkoutPlan(null)}
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
       {/* Account Settings Modal */}
       {showAccountModal && (

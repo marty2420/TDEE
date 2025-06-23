@@ -297,4 +297,66 @@ router.post('/reset-password', async (req, res) => {
   }
 });
 
+
+// Update Workout Preferences
+router.put("/workout-prefs", async (req, res) => {
+  const { userId, workoutPrefs } = req.body;
+
+  if (!userId || !workoutPrefs) {
+    return res.status(400).json({ error: "User ID and workoutPrefs are required" });
+  }
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { workoutPrefs },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    return res.status(200).json({
+      message: "Workout preferences updated",
+      workoutPrefs: updatedUser.workoutPrefs,
+    });
+  } catch (err) {
+    console.error("Error updating workout preferences:", err);
+    res.status(500).json({ error: "Server error while saving workout prefs" });
+  }
+});
+
+
+router.post("/generate-workout", async (req, res) => {
+ const age = req.body?.input?.age;
+const gender = req.body?.input?.gender;
+const goal = req.body?.input?.goal;
+const hoursPerDay = req.body?.workoutPrefs?.hoursPerDay;
+const selectedDays = req.body?.workoutPrefs?.selectedDays;
+  if (!age || !gender || !goal || !hoursPerDay || !selectedDays) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  const prompt = `
+acc as a great and experienced fitness coach. Create a 1‑week workout plan for a ${age}-year-old ${gender} who wants to ${goal} weight. 
+They can work out for ${hoursPerDay} hours on: ${selectedDays.join(", ")}. 
+Include warm‑up & cooldown. Format by day and exercise. just state the list of workout have an introduction like "based on your data heres a recommended workoutplan. use only the days selected  ".
+  `;
+
+  try {
+    const out = await hf.chatCompletion({
+      
+      model: "meta-llama/Llama-3.1-8B-Instruct",  // pick any chat-capable HF model
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 30000,
+    });
+    const plan = out.choices[0].message.content;
+    res.json({ plan });
+  } catch (err) {
+    console.error("HF error:", err);
+    res.status(500).json({ error: "Failed to generate plan" });
+  }
+});
+
 module.exports = router;

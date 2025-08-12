@@ -12,7 +12,7 @@ const hf = new InferenceClient(process.env.HF_TOKEN);
 
 generateToken = (userId) => {
   return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
-    expiresIn: "7d", // You can adjust the expiry time as needed
+    expiresIn: "7d", 
   });
 };
 const router = express.Router();
